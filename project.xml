@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project>
+	<window width="800" height="800" fps="60" />
+	
+	<meta title="OpenFLGameTest6" package="com.sample.openflgametest6" version="1.0.0" company="Company Name" />
+	<app main="Main" path="Export" file="OpenFLGameTest6" />
+	
+	<source path="Source" />
+	
+	<haxelib name="openfl" />
+	
+	<assets path="Assets" rename="assets" exclude="openfl.svg" />
+	<icon path="Assets/openfl.svg" />
+	<haxelib name="actuate" />
+	<haxelib name="spritesheet" />
+	
+</project>
