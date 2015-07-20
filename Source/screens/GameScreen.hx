@@ -48,7 +48,7 @@ class GameScreen extends Screen
 		_player = new Player();
 		addChild(_player);
 		_player.x = stage.stageWidth * 0.5;
-		_player.y = stage.stageHeight * 0.5;
+		_player.y = stage.stageHeight * 0.9;
 	}
 	
 	function setupPlayerCollisionManager() 

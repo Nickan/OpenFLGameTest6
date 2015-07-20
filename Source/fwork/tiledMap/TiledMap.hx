@@ -66,7 +66,7 @@ class TiledMap extends Sprite
 				bmp.y = x * bmp.height;
 				addChild(bmp);
 				
-				cells.push(new Cell(levelData.cells[cellIndex].type, bmp.getBounds(parent)));
+				cells.push(new Cell(levelData.cells[cellIndex].type, bmp));
 			}
 		}
 	}

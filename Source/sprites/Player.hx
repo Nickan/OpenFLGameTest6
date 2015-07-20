@@ -18,12 +18,26 @@ import spritesheet.Spritesheet;
  */
 class Player extends Sprite
 {	
-	public var acceleration(default, null) :Point;
+
+	static var HORIZONTAL_SPEED :Float;
+	static var MAX_HORIZONTAL_SPEED :Float;
+	public var velocity(default, null) :Point;
+	public var accel(default, null) :Point;
+	public var collisionScaleX(default, null) :Float = 0.5;
+	public var collisionScaleY(default, null) :Float = 0.9;
+	public var collisionBounds(get, null) :Rectangle;
+	
+	public var readyToJump(default, default) :Bool = true;
 	
 	var _aniSprite :AnimatedSprite;
 	var _gravity :Float;
 	var _horizontalSpeed :Float;
 	var _verticalSpeed :Float;
+	
+	var _brakingForce :Float;
+	
+	var _leftColliderOffset :Float = 0.2;
+	var _rightColliderOffset :Float = 0;
 	
 	public function new() 
 	{
@@ -38,16 +52,19 @@ class Player extends Sprite
 		stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		addEventListener(Event.REMOVED_FROM_STAGE, onRemoved);
 		
-		initializeVariables();
 		setupSprite();
+		initializeVariables();
+		
 	}
 	
 	function initializeVariables() 
 	{
-		acceleration = new Point();
-		_horizontalSpeed = stage.stageWidth * 0.2;
-		
-		_gravity = stage.stageHeight * 0.2;
+		velocity = new Point();
+		_horizontalSpeed = 0;
+		_gravity = height * 12.5;
+		HORIZONTAL_SPEED = width * 40;
+		_brakingForce = width * 20;
+		MAX_HORIZONTAL_SPEED = width * 5;
 	}
 	
 	function setupSprite() 
@@ -75,18 +92,28 @@ class Player extends Sprite
 	}
 	
 	// ================================================ Control Event ================================================== // 
-	private function onKeyDown(e:KeyboardEvent):Void 
+	private function onKeyDown(e :KeyboardEvent):Void 
 	{
-		acceleration.x = 0;
+		//velocity.x = 0;
 		
 		if (e.keyCode == Keyboard.LEFT) {
-			acceleration.x = -_horizontalSpeed;
+			//velocity.x = -_horizontalSpeed;
+			_horizontalSpeed = -HORIZONTAL_SPEED;
 			_aniSprite.scaleX = -1;
 			_aniSprite.x = _aniSprite.width;
 		} else if (e.keyCode == Keyboard.RIGHT) {
-			acceleration.x = _horizontalSpeed;
+			//velocity.x = _horizontalSpeed;
+			_horizontalSpeed = HORIZONTAL_SPEED;
 			_aniSprite.scaleX = 1;
 			_aniSprite.x = 0;
+		}
+		
+		if (e.keyCode == Keyboard.UP) {
+			if (readyToJump) {
+				readyToJump = false;
+				velocity.y = height * -7.5;
+			}
+
 		}
 		
 		//if (e.keyCode
@@ -94,22 +121,71 @@ class Player extends Sprite
 	
 	private function onKeyUp(e:KeyboardEvent):Void 
 	{
-		acceleration.x = 0;
+		if (e.keyCode == Keyboard.LEFT) {
+			if (_horizontalSpeed < 0)
+				_horizontalSpeed = 0;
+		} else if (e.keyCode == Keyboard.RIGHT) {
+			if (_horizontalSpeed > 0)
+				_horizontalSpeed = 0;
+		}
 	}
 	
 	
 	public function onUpdate(dt :Float) 
 	{
+		updateVelocity(dt);
+		
 		if (_aniSprite != null)
 			_aniSprite.update(Std.int(dt * 1000));
 			
-		this.x += (acceleration.x * dt);
-		this.y += (acceleration.y * dt) + (_gravity * dt);
+		//this.x += (velocity.x * dt);
+		//this.y += (velocity.y * dt);
+	}
+	
+	function updateVelocity(dt:Float) 
+	{
+		var interpHoriSpeed = _horizontalSpeed * dt;
+		velocity.x += interpHoriSpeed;
+		
+		if (velocity.x != 0) {
+			if (velocity.x > MAX_HORIZONTAL_SPEED)
+				velocity.x = MAX_HORIZONTAL_SPEED;
+			else if (velocity.x < -MAX_HORIZONTAL_SPEED)
+				velocity.x = -MAX_HORIZONTAL_SPEED;
+		}
+		
+			
+		velocity.y += _gravity * dt;
+		
+		if (velocity.x != 0) {
+			var interpBrakingForce = _brakingForce * dt;
+			if (velocity.x > 0) 
+				velocity.x -= interpBrakingForce
+			else
+				velocity.x += interpBrakingForce;
+				
+			if (Math.abs(velocity.x) < interpBrakingForce)
+				velocity.x = 0;
+		}
 	}
 	
 	function applyGravity(dt :Float) 
 	{
 		
+	}
+	
+	
+	function get_collisionBounds() :Rectangle
+	{
+		var bounds = getBounds(parent);
+		
+		var scaledWidth = bounds.width * collisionScaleX;
+		var scaledHeight = bounds.height * collisionScaleY;
+		
+		var offsetX = (bounds.width - scaledWidth) * 0.5;
+		var offsetY = (bounds.height - scaledHeight) * 0.5;
+		bounds.setTo(bounds.x + offsetX, bounds.y + offsetY, scaledWidth, scaledHeight);
+		return bounds;
 	}
 	
 	

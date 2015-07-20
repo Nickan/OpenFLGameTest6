@@ -1,4 +1,6 @@
 package fwork.tiledMap;
+import openfl.display.Bitmap;
+import openfl.display.Sprite;
 import openfl.geom.Rectangle;
 
 /**
@@ -8,12 +10,12 @@ import openfl.geom.Rectangle;
 class Cell
 {
 	public var type(default, null) :String;
-	public var bounds(default, null) :Rectangle;
+	public var bitmap(default, null) :Bitmap;
 
-	public function new(type :String, bounds :Rectangle) 
+	public function new(type :String, bitmap :Bitmap) 
 	{
 		this.type = type;
-		this.bounds = bounds;
+		this.bitmap = bitmap;
 	}
 	
 }
