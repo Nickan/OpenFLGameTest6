@@ -34,7 +34,7 @@ class PlayerCollisionManager
 		
 		for (tmpCell in _colliders) {
 			if (tmpCell.type == "door_open") {
-				if (tmpCell.bitmap.getBounds(_parent).contains(playerBounds.x, playerBounds.y)) {
+				if (tmpCell.bitmap.getBounds(_parent).intersects(playerBounds)) {
 					_player.readyToNextLevel = true;
 					break;
 				} else {
@@ -52,6 +52,7 @@ class PlayerCollisionManager
 		_player.y += _player.velocity.y * dt;
 		var playerBounds = _player.collisionBounds;
 		
+		_player.readyToJump = false;
 		for (tmpCell in _colliders) {
 			
 			if (tmpCell.type == "block") {
@@ -61,7 +62,7 @@ class PlayerCollisionManager
 				}
 			} else if (tmpCell.type == "spike_1") {
 				var spikeBounds = tmpCell.bitmap.getBounds(_parent);
-				var scaledWidth = (spikeBounds.width * 0.25);
+				var scaledWidth = (spikeBounds.width * 0.45);
 				var scaledHeight = spikeBounds.height * 0.25;
 				var offsetX = (spikeBounds.width - scaledWidth) * 0.5;
 				var offsetY = (spikeBounds.height - scaledHeight) * 0.5;
@@ -72,7 +73,7 @@ class PlayerCollisionManager
 				}
 			} else if (tmpCell.type == "spike_2") {
 				var spikeBounds = tmpCell.bitmap.getBounds(_parent);
-				var scaledWidth = (spikeBounds.width * 0.25);
+				var scaledWidth = (spikeBounds.width * 0.45);
 				var scaledHeight = spikeBounds.height * 0.25;
 				var offsetX = (spikeBounds.width - scaledWidth) * 0.5;
 				var offsetY = (spikeBounds.height - scaledHeight) * 0.5;
@@ -85,8 +86,6 @@ class PlayerCollisionManager
 				
 			
 		}
-		
-		
 	}
 	
 	function moveHorizontallyAndCheckForCollision(dt :Float) 
@@ -102,7 +101,7 @@ class PlayerCollisionManager
 				}
 			} else if (tmpCell.type == "spike_1") {
 				var spikeBounds = tmpCell.bitmap.getBounds(_parent);
-				var scaledWidth = (spikeBounds.width * 0.25);
+				var scaledWidth = (spikeBounds.width * 0.45);
 				var scaledHeight = spikeBounds.height * 0.25;
 				var offsetX = (spikeBounds.width - scaledWidth) * 0.5;
 				var offsetY = (spikeBounds.height - scaledHeight) * 0.5;
@@ -113,7 +112,7 @@ class PlayerCollisionManager
 				}
 			} else if (tmpCell.type == "spike_2") {
 				var spikeBounds = tmpCell.bitmap.getBounds(_parent);
-				var scaledWidth = (spikeBounds.width * 0.25);
+				var scaledWidth = (spikeBounds.width * 0.45);
 				var scaledHeight = spikeBounds.height * 0.25;
 				var offsetX = (spikeBounds.width - scaledWidth) * 0.5;
 				var offsetY = (spikeBounds.height - scaledHeight) * 0.5;
@@ -166,14 +165,15 @@ class PlayerCollisionManager
 		_player.velocity.y = 0;
 		_player.y = cell.bitmap.y - (_player.collisionBounds.height + 2);
 		
-		if (_jumpReset) {
-			if (!_player.readyToJump)
-				_player.readyToJump = true;
-			_jumpReset = false;
-		}
-
-		if (!_player.readyToJump)
-			_jumpReset = true;
+		_player.readyToJump = true;
+		//if (_jumpReset) {
+			//if (!_player.readyToJump)
+				//_player.readyToJump = true;
+			//_jumpReset = false;
+		//}
+//
+		//if (!_player.readyToJump)
+			//_jumpReset = true;
 	}
 	
 	function playerCollidesOnCeiling(cell:Cell) 

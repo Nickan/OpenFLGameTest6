@@ -27,7 +27,7 @@ class Player extends Sprite
 	static var MAX_HORIZONTAL_SPEED :Float;
 	public var velocity(default, null) :Point;
 	public var accel(default, null) :Point;
-	public var collisionScaleX(default, null) :Float = 0.5;
+	public var collisionScaleX(default, null) :Float = 0.35;
 	public var collisionScaleY(default, null) :Float = 0.9;
 	public var collisionBounds(get, null) :Rectangle;
 	
@@ -40,6 +40,7 @@ class Player extends Sprite
 	var _verticalSpeed :Float;
 	
 	var _brakingForce :Float;
+	//var _levelChanged :Bool = false;
 	
 	public function new() 
 	{
@@ -63,10 +64,10 @@ class Player extends Sprite
 	{
 		velocity = new Point();
 		_horizontalSpeed = 0;
-		_gravity = height * 12.5;
+		_gravity = height * 50;
 		HORIZONTAL_SPEED = width * 40;
 		_brakingForce = width * 20;
-		MAX_HORIZONTAL_SPEED = width * 5;
+		MAX_HORIZONTAL_SPEED = width * 7.5;
 	}
 	
 	function setupSprite() 
@@ -113,19 +114,23 @@ class Player extends Sprite
 		if (e.keyCode == Keyboard.SPACE) {
 			if (readyToJump) {
 				readyToJump = false;
-				velocity.y = height * -7.5;
+				velocity.y = height * -15;
 			}
 
 		}
 		
 		if (readyToNextLevel) {
-			if (e.keyCode == Keyboard.UP) {
-				var gameState = GameData.getInstance().moveToNextStage();
-				switch (gameState) {
-					case MOVE_TO_NEXT_LEVEL: ScreenManager.getInstance().showOnScreen(new GameScreen(GameData.getInstance().level));
-					case WIN: ScreenManager.getInstance().showOnScreen(new WinScreen());
+			//if (!_levelChanged) {
+				//_levelChanged = true;
+				if (e.keyCode == Keyboard.UP) {
+					var gameState = GameData.getInstance().moveToNextStage();
+					switch (gameState) {
+						case MOVE_TO_NEXT_LEVEL: ScreenManager.getInstance().showOnScreen(new GameScreen(GameData.getInstance().level));
+						case WIN: ScreenManager.getInstance().showOnScreen(new WinScreen());
+					}
 				}
-			}
+			//}
+			
 		}
 		
 		//if (e.keyCode
@@ -183,6 +188,8 @@ class Player extends Sprite
 				_aniSprite.showBehavior("stand", true);
 				velocity.x = 0;
 			}
+		} else {
+			_aniSprite.showBehavior("stand", true);
 		}
 	}
 	

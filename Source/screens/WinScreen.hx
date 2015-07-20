@@ -3,7 +3,9 @@ import fwork.Screen;
 import fwork.ScreenManager;
 import openfl.Assets;
 import openfl.display.Bitmap;
+import openfl.events.KeyboardEvent;
 import openfl.events.MouseEvent;
+import openfl.ui.Keyboard;
 
 /**
  * ...
@@ -34,13 +36,16 @@ class WinScreen extends Screen
 	
 	function setupControls() 
 	{
-		stage.addEventListener(MouseEvent.CLICK, onClick);
+		stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeydown);
 	}
 	
-	private function onClick(e:MouseEvent):Void 
+	private function onKeydown(e:KeyboardEvent):Void 
 	{
-		stage.removeEventListener(MouseEvent.CLICK, onClick);
-		ScreenManager.getInstance().showOnScreen(new TitleScreen());
+		if (e.keyCode == Keyboard.SPACE) {
+			stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeydown);
+			ScreenManager.getInstance().showOnScreen(new TitleScreen());
+		}
+		
 	}
 	
 }
