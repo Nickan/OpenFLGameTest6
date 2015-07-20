@@ -1,7 +1,9 @@
 package;
+import fwork.ScreenManager;
 import fwork.tiledMap.Cell;
 import openfl.display.DisplayObject;
 import openfl.geom.Rectangle;
+import screens.GameOverScreen;
 import sprites.Player;
 
 /**
@@ -14,6 +16,7 @@ class PlayerCollisionManager
 	var _colliders :Array<Cell>;
 	var _parent :DisplayObject;
 	var _jumpReset :Bool = true;
+	var _gameOver :Bool = false;
 	
 	public function new(player :Player, colliders :Array<Cell>, parent :DisplayObject) 
 	{
@@ -24,6 +27,22 @@ class PlayerCollisionManager
 	
 	public function onUpdate(dt :Float)
 	{
+		if (_gameOver)
+			return;
+			
+		var playerBounds = _player.collisionBounds;
+		
+		for (tmpCell in _colliders) {
+			if (tmpCell.type == "door_open") {
+				if (tmpCell.bitmap.getBounds(_parent).contains(playerBounds.x, playerBounds.y)) {
+					_player.readyToNextLevel = true;
+					break;
+				} else {
+					_player.readyToNextLevel = false;
+				}
+			}
+		}
+		
 		moveVerticallyAndCheckForCollision(dt);
 		moveHorizontallyAndCheckForCollision(dt);
 	}
@@ -34,12 +53,40 @@ class PlayerCollisionManager
 		var playerBounds = _player.collisionBounds;
 		
 		for (tmpCell in _colliders) {
-			if (playerBounds.intersects(tmpCell.bitmap.getBounds(_parent))) {
-				//_player.y -= _player.velocity.y * dt;
-				playerCollidesVerticallyWith(tmpCell);
-				break;
+			
+			if (tmpCell.type == "block") {
+				if (playerBounds.intersects(tmpCell.bitmap.getBounds(_parent))) {
+					playerCollidesVerticallyWith(tmpCell);
+					break;
+				}
+			} else if (tmpCell.type == "spike_1") {
+				var spikeBounds = tmpCell.bitmap.getBounds(_parent);
+				var scaledWidth = (spikeBounds.width * 0.25);
+				var scaledHeight = spikeBounds.height * 0.25;
+				var offsetX = (spikeBounds.width - scaledWidth) * 0.5;
+				var offsetY = (spikeBounds.height - scaledHeight) * 0.5;
+				spikeBounds.setTo(spikeBounds.x + offsetX, spikeBounds.y + offsetY, scaledWidth, scaledHeight);
+				if (playerBounds.intersects(spikeBounds)) {
+					onGameOver();
+					break;
+				}
+			} else if (tmpCell.type == "spike_2") {
+				var spikeBounds = tmpCell.bitmap.getBounds(_parent);
+				var scaledWidth = (spikeBounds.width * 0.25);
+				var scaledHeight = spikeBounds.height * 0.25;
+				var offsetX = (spikeBounds.width - scaledWidth) * 0.5;
+				var offsetY = (spikeBounds.height - scaledHeight) * 0.5;
+				spikeBounds.setTo(spikeBounds.x + offsetX, spikeBounds.y + offsetY, scaledWidth, scaledHeight);
+				if (playerBounds.intersects(spikeBounds)) {
+					onGameOver();
+					break;
+				}
 			}
+				
+			
 		}
+		
+		
 	}
 	
 	function moveHorizontallyAndCheckForCollision(dt :Float) 
@@ -48,16 +95,48 @@ class PlayerCollisionManager
 		var playerBounds = _player.collisionBounds;
 		
 		for (tmpCell in _colliders) {
-			if (playerBounds.intersects(tmpCell.bitmap.getBounds(_parent))) {
-				//_player.x -= _player.velocity.x * dt;
-				playerCollidesHorizontallyWith(tmpCell);
-				break;
+			if (tmpCell.type == "block") {
+				if (playerBounds.intersects(tmpCell.bitmap.getBounds(_parent))) {
+					playerCollidesHorizontallyWith(tmpCell);
+					break;
+				}
+			} else if (tmpCell.type == "spike_1") {
+				var spikeBounds = tmpCell.bitmap.getBounds(_parent);
+				var scaledWidth = (spikeBounds.width * 0.25);
+				var scaledHeight = spikeBounds.height * 0.25;
+				var offsetX = (spikeBounds.width - scaledWidth) * 0.5;
+				var offsetY = (spikeBounds.height - scaledHeight) * 0.5;
+				spikeBounds.setTo(spikeBounds.x + offsetX, spikeBounds.y + offsetY, scaledWidth, scaledHeight);
+				if (playerBounds.intersects(spikeBounds)) {
+					onGameOver();
+					break;
+				}
+			} else if (tmpCell.type == "spike_2") {
+				var spikeBounds = tmpCell.bitmap.getBounds(_parent);
+				var scaledWidth = (spikeBounds.width * 0.25);
+				var scaledHeight = spikeBounds.height * 0.25;
+				var offsetX = (spikeBounds.width - scaledWidth) * 0.5;
+				var offsetY = (spikeBounds.height - scaledHeight) * 0.5;
+				spikeBounds.setTo(spikeBounds.x + offsetX, spikeBounds.y + offsetY, scaledWidth, scaledHeight);
+				if (playerBounds.intersects(spikeBounds)) {
+					onGameOver();
+					break;
+				}
 			}
 		}
 		
 		if (_player.readyToJump) {
 			//if (!_player.movingHorizontally)
 				//_player.velocity.x = 0;
+		}
+	}
+	
+	function onGameOver() 
+	{
+		
+		if (_gameOver == false) {
+			_gameOver = true;
+			ScreenManager.getInstance().showOnScreen(new GameOverScreen());
 		}
 	}
 	
@@ -79,7 +158,6 @@ class PlayerCollisionManager
 			else
 				playerCollidesOnCeiling(cell);
 		}
-		
 		
 	}
 	

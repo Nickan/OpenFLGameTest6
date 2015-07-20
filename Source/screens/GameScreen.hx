@@ -16,9 +16,11 @@ class GameScreen extends Screen
 	var _player :Player;
 	var _playerCollisionManager :PlayerCollisionManager;
 	var _tiledMap :TiledMap;
+	var _level :Int;
 
-	public function new() 
+	public function new(level :Int) 
 	{
+		_level = level;
 		super();
 	}
 	
@@ -39,7 +41,7 @@ class GameScreen extends Screen
 	
 	function setupTiledMap() 
 	{
-		_tiledMap = new TiledMap("assets/json/level_data_1.json");
+		_tiledMap = new TiledMap("assets/json/level_data_" + _level + ".json");
 		addChild(_tiledMap);
 	}
 	
@@ -47,7 +49,7 @@ class GameScreen extends Screen
 	{
 		_player = new Player();
 		addChild(_player);
-		_player.x = stage.stageWidth * 0.5;
+		_player.x = stage.stageWidth * 0.9;
 		_player.y = stage.stageHeight * 0.9;
 	}
 	

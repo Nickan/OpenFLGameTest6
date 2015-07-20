@@ -1,4 +1,5 @@
 package sprites;
+import fwork.ScreenManager;
 import haxe.xml.Fast;
 import openfl.Assets;
 import openfl.display.Sprite;
@@ -7,6 +8,9 @@ import openfl.events.KeyboardEvent;
 import openfl.geom.Point;
 import openfl.geom.Rectangle;
 import openfl.ui.Keyboard;
+import screens.GameScreen;
+import screens.TitleScreen;
+import screens.WinScreen;
 import spritesheet.AnimatedSprite;
 import spritesheet.data.BehaviorData;
 import spritesheet.importers.BitmapImporter;
@@ -28,6 +32,7 @@ class Player extends Sprite
 	public var collisionBounds(get, null) :Rectangle;
 	
 	public var readyToJump(default, default) :Bool = true;
+	public var readyToNextLevel(default, default) :Bool = false;
 	
 	var _aniSprite :AnimatedSprite;
 	var _gravity :Float;
@@ -35,9 +40,6 @@ class Player extends Sprite
 	var _verticalSpeed :Float;
 	
 	var _brakingForce :Float;
-	
-	var _leftColliderOffset :Float = 0.2;
-	var _rightColliderOffset :Float = 0;
 	
 	public function new() 
 	{
@@ -88,7 +90,7 @@ class Player extends Sprite
 		_aniSprite = new AnimatedSprite(spriteSheet, true);
 		addChild(_aniSprite);
 		
-		_aniSprite.showBehavior("run", true);
+		_aniSprite.showBehavior("stand", true);
 	}
 	
 	// ================================================ Control Event ================================================== // 
@@ -108,12 +110,22 @@ class Player extends Sprite
 			_aniSprite.x = 0;
 		}
 		
-		if (e.keyCode == Keyboard.UP) {
+		if (e.keyCode == Keyboard.SPACE) {
 			if (readyToJump) {
 				readyToJump = false;
 				velocity.y = height * -7.5;
 			}
 
+		}
+		
+		if (readyToNextLevel) {
+			if (e.keyCode == Keyboard.UP) {
+				var gameState = GameData.getInstance().moveToNextStage();
+				switch (gameState) {
+					case MOVE_TO_NEXT_LEVEL: ScreenManager.getInstance().showOnScreen(new GameScreen(GameData.getInstance().level));
+					case WIN: ScreenManager.getInstance().showOnScreen(new WinScreen());
+				}
+			}
 		}
 		
 		//if (e.keyCode
@@ -158,14 +170,19 @@ class Player extends Sprite
 		velocity.y += _gravity * dt;
 		
 		if (velocity.x != 0) {
+			if (_aniSprite.currentBehavior.name != "run")
+				_aniSprite.showBehavior("run");
+			
 			var interpBrakingForce = _brakingForce * dt;
 			if (velocity.x > 0) 
 				velocity.x -= interpBrakingForce
 			else
 				velocity.x += interpBrakingForce;
 				
-			if (Math.abs(velocity.x) < interpBrakingForce)
+			if (Math.abs(velocity.x) < interpBrakingForce) {
+				_aniSprite.showBehavior("stand", true);
 				velocity.x = 0;
+			}
 		}
 	}
 	

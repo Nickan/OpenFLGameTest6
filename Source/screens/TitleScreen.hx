@@ -19,6 +19,7 @@ class TitleScreen extends Screen
 	public function new() 
 	{
 		super();
+		GameData.getInstance().reset();
 	}
 	
 	override public function onAdded():Void 
@@ -52,7 +53,7 @@ class TitleScreen extends Screen
 	{
 		if (e.keyCode == Keyboard.SPACE) {
 			stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyboardDown);
-			ScreenManager.getInstance().showOnScreen(new GameScreen());
+			ScreenManager.getInstance().showOnScreen(new GameScreen(GameData.getInstance().level));
 		}
 	}
 	

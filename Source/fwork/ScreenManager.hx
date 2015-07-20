@@ -44,13 +44,17 @@ class ScreenManager extends Sprite
 			_previousScreen = _currentScreen;
 			
 			playAlphaToTransparent(_previousScreen, DURATION, onScreenFullyTransparent);
-			Timer.delay(onShowCurrentScreen, Std.int(DURATION * 1000));
+			Timer.delay(function() {
+				_currentScreen = screen;
+				onShowCurrentScreen();
+			}, Std.int(DURATION * 1000));
 		} else {
 			addChild(screen);
 			screen.onAdded();
 			playAlphaToOpaque(screen, DURATION, onScreenFullyOpaque);
+			_currentScreen = screen;
 		}
-		_currentScreen = screen;
+		//_currentScreen = screen;
 	}
 	
 	public function showOnTop(screen :Screen) {
