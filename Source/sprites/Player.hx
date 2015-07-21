@@ -104,6 +104,9 @@ class Player extends Sprite
 			_horizontalSpeed = -HORIZONTAL_SPEED;
 			_aniSprite.scaleX = -1;
 			_aniSprite.x = _aniSprite.width;
+			#if html5
+				_aniSprite.x = -_aniSprite.width;
+			#end
 		} else if (e.keyCode == Keyboard.RIGHT) {
 			//velocity.x = _horizontalSpeed;
 			_horizontalSpeed = HORIZONTAL_SPEED;
